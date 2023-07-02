@@ -14,32 +14,29 @@ import bgitatest.processors.PageDetailsFetcher;
 import bgitatest.processors.ShlokeDownloader;
 
 public class App {
-    public String getGreeting() {
-        return "Hello World!";
-    }
-
     public static void main(String[] args) throws IOException, InterruptedException {
-        int index=0;
+        int index = 0;
         ExecutorService downloaderThreadPool = Executors.newFixedThreadPool(100);
-        String startPageUrl="https://www.gitasupersite.iitk.ac.in/srimad?language=dv&field_chapter_value=1&field_nsutra_value=1&show_tej=1&httyn=1&choose=1";        String nextURL=startPageUrl;
-        String prevURL="";
-        do{
-        try{
-        ShlokePage page = PageDetailsFetcher.fetchShlokePage(nextURL);
-        page.getShloke().setIndex(index++);
-        prevURL=page.getPrevPageURL();
-        nextURL=page.getNextPageURL();
-        // System.out.println(page);
-        Future<?> rt = downloaderThreadPool.submit(new ShlokeDownloader(page.getShloke()));
-        }catch(IOException ex)
-        {
-            System.out.println("Error: "+ex.getMessage());
-            ex.printStackTrace();
-        }
-        }
-        while(!(nextURL.matches(".+?field_chapter_value=1(&.+||$)")&&nextURL.matches(".+?field_nsutra_value=1(&.+||$)")));
-        
-        System.out.println("All fetched. Waiting for download to finish");downloaderThreadPool.shutdown();
+        String startPageUrl = "https://www.gitasupersite.iitk.ac.in/srimad?language=dv&field_chapter_value=1&field_nsutra_value=1&show_tej=1&httyn=1&choose=1";
+        String nextURL = startPageUrl;
+        String prevURL = "";
+        do {
+            try {
+                ShlokePage page = PageDetailsFetcher.fetchShlokePage(nextURL);
+                page.getShloke().setIndex(index++);
+                prevURL = page.getPrevPageURL();
+                nextURL = page.getNextPageURL();
+                // System.out.println(page);
+                Future<?> rt = downloaderThreadPool.submit(new ShlokeDownloader(page.getShloke()));
+            } catch (IOException ex) {
+                System.out.println("Error: " + ex.getMessage());
+                ex.printStackTrace();
+            }
+        } while (!(nextURL.matches(".+?field_chapter_value=1(&.+||$)")
+                && nextURL.matches(".+?field_nsutra_value=1(&.+||$)")));
+
+        System.out.println("All fetched. Waiting for download to finish");
+        downloaderThreadPool.shutdown();
         downloaderThreadPool.awaitTermination(2, TimeUnit.MINUTES);
         System.out.println("Exiting!");
     }
