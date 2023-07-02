@@ -5,3 +5,5 @@
 build
 output/*
 app/bin/**
+app/bin/*
+app/bin
